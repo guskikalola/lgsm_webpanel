@@ -40,7 +40,6 @@ export default {
     servernameRules: [
       (v) => !!v || "Server name is required",
       (v) => v.length <= 50 || "Name must be less than 50 characters",
-      (v) => (v || "").indexOf(" ") < 0 || "No spaces are allowed",
     ],
     gamenameRules: [
       (v) => !!v || "Game name is required",

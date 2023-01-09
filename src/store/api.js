@@ -25,6 +25,24 @@ const useAppStore = defineStore("api", {
         }
       });
     },
+    updateServer: function(server_name) {
+      let endpoint = this.baseURL + `server/${server_name}?with_details=false`;
+      return new Promise((resolve, reject) => {
+        fetch(endpoint).then(async (res) => {
+          try {
+            let server = await res.json();
+            if (this.servers[server_name] != undefined) {
+              let details = this.servers[server_name].details; 
+              this.servers[server_name] = server;
+              this.servers[server_name].details = details;
+            }
+            resolve(true);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+    },
     feedServerDetails: function (server_name) {
       let endpoint = this.baseURL + `server/${server_name}?with_details=true`;
       return new Promise((resolve, reject) => {

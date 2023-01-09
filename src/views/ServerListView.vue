@@ -4,8 +4,7 @@
       <v-row class="d-flex align-center justify-center">
         <v-col v-for="(server ,index) in Object.values(API.servers)" :key="server.server_name" cols="auto">
           <ServerOverview
-            :server_name="server.server_name"
-            :game_name="server.game_name"
+            :server="server"
           />
         </v-col>
       </v-row>

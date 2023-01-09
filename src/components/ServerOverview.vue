@@ -1,12 +1,12 @@
 <template>
-  <v-card :title="server_name" variant="tonal" :loading="loading">
+  <v-card :title="server.server_pretty_name" variant="tonal" :loading="loading">
     <v-card-text>
       <v-row align="center">
         <v-col class="text-h6" cols="6">
-          <ServerStatus :server_status="API.servers[server_name].details?.status" />
+          <ServerStatus :server_status="API.servers[server.server_name].server_status" />
         </v-col>
         <v-col cols="6" class="text-right">
-          <GameIcon :game_name="game_name" />
+          <GameIcon :game_name="server.game_name" />
         </v-col>
       </v-row>
     </v-card-text>
@@ -15,21 +15,21 @@
         color="green"
         @click="executeMethod('start')"
         variant="outlined"
-        :disabled="loading || API.servers[server_name].details?.status == 'STARTED'"
+        :disabled="loading || API.servers[server.server_name].server_status == ServerStatusEnum.STARTED"
         >START</v-btn
       >
       <v-btn
         color="red"
         @click="executeMethod('stop')"
         variant="outlined"
-        :disabled="loading || API.servers[server_name].details?.status != 'STARTED'"
+        :disabled="loading || API.servers[server.server_name].server_status != ServerStatusEnum.STARTED"
         >STOP</v-btn
       >
       <v-btn
         color="grey"
         @click="executeMethod('restart')"
         variant="outlined"
-        :disabled="loading || API.servers[server_name].details?.status == 'NOT INSTALLED'"
+        :disabled="loading || API.servers[server.server_name].server_status == ServerStatusEnum.NOT_INSTALLED"
         >RESTART</v-btn
       >
       <v-btn
@@ -51,17 +51,19 @@
 import ServerStatus from "./ServerStatus.vue";
 import GameIcon from "./GameIcon.vue";
 import ApiStore from "@/store/api.js";
+import ServerStatusEnum from "@/services/enums/ServerStatusEnum.js";
 export default {
-  props: ["server_name", "game_name"],
+  props: ["server"],
   data() {
     const apiStore = ApiStore();
     return {
       loading: false,
       API: apiStore,
+      ServerStatusEnum : ServerStatusEnum,
       executeMethod: (method) => {
         this.loading = true;
         apiStore
-          .executeMethod(this.server_name, method)
+          .executeMethod(this.server.server_name, method)
           .then(() => {
             this.loading = false;
             this.updateServerData()
@@ -76,7 +78,7 @@ export default {
       updateServerData: () => {
         this.loading = true;
         apiStore
-          .feedServerDetails(this.server_name)
+          .updateServer(this.server.server_name)
           .then(() => {
             this.loading = false;
           })
@@ -84,7 +86,7 @@ export default {
             this.loading = false;
             console.error(
               "Error while feeding(updating) server data: " +
-                this.server_name +
+                this.server.server_name +
                 " Err: " +
                 err
             );
@@ -93,7 +95,6 @@ export default {
     };
   },
   mounted() {
-    if(this.API.servers[this.server_name].details == undefined)
     this.updateServerData();
   },
   components: {

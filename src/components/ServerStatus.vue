@@ -4,15 +4,16 @@
 
 <script>
 import { computed } from 'vue-demi'
+import ServerStatusEnum from '@/services/enums/ServerStatusEnum.js'
     export default {
         props: ["server_status"],
         data() {
             return {
                 text_color : computed(() => {
                     switch(this.server_status) {
-                        case "STARTED":
+                        case ServerStatusEnum.STARTED:
                             return "text-green";
-                        case "STOPPED":
+                        case ServerStatusEnum.STOPPED:
                             return "text-red";
                         default:
                             return "text-orange"
