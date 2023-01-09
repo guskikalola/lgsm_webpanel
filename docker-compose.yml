@@ -1,0 +1,51 @@
+services:
+  db:
+    container_name: lgsm_webpanel-database
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_USER: lgsm_webpanel
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: lgsm_webpanel
+      MARIADB_ROOT_PASSWORD: admin
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      timeout: 5s
+      retries: 10
+
+  backend:
+    container_name: lgsm_webpanel-backend
+    image: guskikalola/lgsm_webpanel_backend:latest
+    volumes:
+      - ./servers:/servers
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      MARIADB_USER: lgsm_webpanel
+      MARIADB_PASSWORD: password
+      MARIADB_HOST: db
+      MARIADB_DATABASE: lgsm_webpanel
+      AUTHENTICATION_ENABLED: false
+      HASHING_SECRET_KEY: 252e6147bfc4b098dd5b307ff7d742573b57c9af70bc4a5aea2014bbc668dc55 # openssl rand -hex 32
+      HASHING_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: "50"
+      SERVERS_DIR: <local_path_to_servers> # Needed for template generation, has to be absolute ( Ex.: /home/devel/servers )
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    container_name: lgsm_webpanel-frontend
+    image: guskikalola/lgsm_webpanel_frontend:latest
+
+  proxy:
+    container_name: lgsm_webpanel-proxy
+    image: nginx
+    restart: always
+    ports:
+      - 8000:80
+    depends_on:
+      - backend
+      # - frontend
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
