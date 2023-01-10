@@ -1,12 +1,10 @@
 <template>
   <v-card :title="server.server_pretty_name" variant="tonal" :loading="loading">
+          <GameIcon :game_name="server.game_name" />
     <v-card-text>
       <v-row align="center">
-        <v-col class="text-h6" cols="6">
+        <v-col class="text-h6" cols="12">
           <ServerStatus :server_status="API.servers[server.server_name].server_status" />
-        </v-col>
-        <v-col cols="6" class="text-right">
-          <GameIcon :game_name="server.game_name" />
         </v-col>
       </v-row>
     </v-card-text>
