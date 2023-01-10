@@ -8,16 +8,18 @@
           :counter="50"
           label="Server name"
           required
+          prepend-inner-icon="mdi-server"
         ></v-text-field>
       </v-col>
       <v-col cols="12" md="4">
-        <v-text-field
+        <v-combobox
           v-model="gamename"
-          :rules="gamenameRules"
-          :counter="50"
           label="Game name"
+          clearable
+          :items="API.gameList.map(item => item.game_full_name)"
           required
-        ></v-text-field>
+          prepend-inner-icon="mdi-controller"
+        ></v-combobox>
       </v-col>
       <v-btn type="submit" color="success" class="mr-4">Create</v-btn>
     </v-container>
@@ -29,6 +31,7 @@ import ApiStore from "@/store/api.js";
 export default {
   setup() {
     const apiStore = ApiStore();
+    apiStore.updateGameList()
     return {
       API: apiStore,
     };
@@ -40,12 +43,7 @@ export default {
     servernameRules: [
       (v) => !!v || "Server name is required",
       (v) => v.length <= 50 || "Name must be less than 50 characters",
-    ],
-    gamenameRules: [
-      (v) => !!v || "Game name is required",
-      (v) => v.length <= 50 || "Name must be less than 50 characters",
-      (v) => (v || "").indexOf(" ") < 0 || "No spaces are allowed",
-    ],
+    ]
   }),
   methods: {
     async validate() {
@@ -56,8 +54,7 @@ export default {
     async submit() {
       await this.validate();
       if (!this.valid) return false;
-
-      this.API.createServer(this.servername, this.gamename)
+      this.API.createServer(this.servername, this.API.getGameIdentifier(this.gamename))
         .then((server) => {
           console.log("New server created", server);
           this.$refs.form.reset();
@@ -66,6 +63,6 @@ export default {
           alert(err["detail"][0]["msg"]); // TODO : Move this to notification system
         });
     },
-  },
+  }
 };
 </script>

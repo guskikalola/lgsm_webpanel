@@ -1,46 +1,99 @@
 <template>
-  <v-card :title="server.server_pretty_name" variant="tonal" :loading="loading">
-          <GameIcon :game_name="server.game_name" />
-    <v-card-text>
+  <v-card variant="tonal" :loading="loading" :width="388">
+    <v-toolbar
+      :title="server.server_pretty_name"
+      :elevation="8"
+      density="compact"
+    >
+    <v-dialog
+      v-model="dialog"
+      persistent
+    >
+    <template v-slot:activator="{ props }">
+        <v-btn icon="mdi-trash-can" color="red" v-bind="props"></v-btn>
+    </template>
+    <v-card>
+        <v-card-title class="text-h5">
+          Delete this server?
+        </v-card-title>
+        <v-card-text>You are about to delete <span style="font-weight: -1; color:goldenrod">"{{ server.server_pretty_name }}"</span></v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="green-darken-1"
+            variant="text"
+            @click="dialog = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="red"
+            variant="text"
+            @click="deleteServer"
+          >
+            Agree
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    </v-toolbar>
+    <GameIcon :game_name="server.game_name" />
+    <v-card-text class="text-center">
       <v-row align="center">
         <v-col class="text-h6" cols="12">
-          <ServerStatus :server_status="API.servers[server.server_name].server_status" />
+          <ServerStatus
+            :server_status="API.servers[server.server_name].server_status"
+          />
         </v-col>
       </v-row>
     </v-card-text>
-    <v-card-actions>
+    <v-card-actions class="d-flex align-center justify-center">
       <v-btn
         color="green"
         @click="executeMethod('start')"
         variant="outlined"
-        :disabled="loading || API.servers[server.server_name].server_status == ServerStatusEnum.STARTED"
-        >START</v-btn
+        :disabled="
+          loading ||
+          API.servers[server.server_name].server_status ==
+            ServerStatusEnum.STARTED
+        "
+        >{{ API.servers[server.server_name].server_status == ServerStatusEnum.NOT_INSTALLED ? "INSTALL" : "START" }}</v-btn
       >
       <v-btn
         color="red"
         @click="executeMethod('stop')"
         variant="outlined"
-        :disabled="loading || API.servers[server.server_name].server_status != ServerStatusEnum.STARTED"
+        :disabled="
+          loading ||
+          API.servers[server.server_name].server_status !=
+            ServerStatusEnum.STARTED
+        "
         >STOP</v-btn
       >
       <v-btn
         color="grey"
         @click="executeMethod('restart')"
         variant="outlined"
-        :disabled="loading || API.servers[server.server_name].server_status == ServerStatusEnum.NOT_INSTALLED"
+        :disabled="
+          loading ||
+          API.servers[server.server_name].server_status ==
+            ServerStatusEnum.NOT_INSTALLED
+        "
         >RESTART</v-btn
       >
-      <v-btn
-        color="grey"
-        @click="updateServerData"
-        variant="outlined"
-        :disabled="loading"
-        >
-        <v-icon icon="mdi-reload">
-          
-        </v-icon>
-        </v-btn
-      >
+      <v-tooltip text="Fetch server status" location="top">
+        <template v-slot:activator="{ props }">
+          <v-btn
+            color="grey"
+            @click="updateServerData"
+            variant="outlined"
+            :disabled="loading"
+            v-bind="props"
+          >
+            <v-icon icon="mdi-reload"> </v-icon>
+          </v-btn>
+        </template>
+      </v-tooltip>
     </v-card-actions>
   </v-card>
 </template>
@@ -55,16 +108,20 @@ export default {
   data() {
     const apiStore = ApiStore();
     return {
+      dialog: false,
       loading: false,
       API: apiStore,
-      ServerStatusEnum : ServerStatusEnum,
+      ServerStatusEnum: ServerStatusEnum,
       executeMethod: (method) => {
         this.loading = true;
+        if(this.server.server_status == ServerStatusEnum.NOT_INSTALLED) {
+          alert("First run takes some time, it might appear as STOPPED but the server is installing in the background.")
+        }
         apiStore
           .executeMethod(this.server.server_name, method)
           .then(() => {
             this.loading = false;
-            this.updateServerData()
+            this.updateServerData();
           })
           .catch((err) => {
             this.loading = false;
@@ -90,6 +147,15 @@ export default {
             );
           });
       },
+      deleteServer: () => {
+        this.loading = true;
+        apiStore
+        .deleteServer(this.server.server_name)
+        .then(() => {
+          this.loading = false;
+        })
+        this.dialog = false;
+      }
     };
   },
   mounted() {

@@ -5,6 +5,7 @@ const useAppStore = defineStore("api", {
   state: () => ({
     servers: {},
     baseURL: "/api/v1/",
+    gameList: [],
   }),
   getters: {},
   actions: {
@@ -25,18 +26,18 @@ const useAppStore = defineStore("api", {
         }
       });
     },
-    updateServer: function(server_name) {
+    updateServer: function (server_name) {
       let endpoint = this.baseURL + `server/${server_name}?with_details=false`;
       return new Promise((resolve, reject) => {
         fetch(endpoint).then(async (res) => {
           try {
             let server = await res.json();
             if (this.servers[server_name] != undefined) {
-              let details = this.servers[server_name].details; 
+              let details = this.servers[server_name].details;
               this.servers[server_name] = server;
               this.servers[server_name].details = details;
             }
-            resolve(true);
+            resolve(server);
           } catch (e) {
             reject(e);
           }
@@ -72,26 +73,61 @@ const useAppStore = defineStore("api", {
     },
     createServer: function (server_name, game_name) {
       let endpoint = this.baseURL + `server/create`;
-      return new Promise((resolve,reject) => {
+      return new Promise((resolve, reject) => {
         fetch(endpoint, {
           method: "POST",
           body: JSON.stringify({
-            "server_name":server_name,
-            "game_name":game_name
+            server_name: server_name,
+            game_name: game_name,
           }),
           headers: {
-            "Content-type": "application/json"
-          }
-        })
-        .then(async res => {
-          if(res.status == 200) {
-            resolve(await res.json())
+            "Content-type": "application/json",
+          },
+        }).then(async (res) => {
+          if (res.status == 200) {
+            resolve(await res.json());
           } else {
             reject(await res.json());
           }
-        })
+        });
       });
-    }
+    },
+    deleteServer: function (server_name) {
+      let endpoint = this.baseURL + `server/` + server_name;
+      return new Promise((resolve, reject) => {
+        fetch(endpoint, {
+          method: "DELETE",
+        }).then(async (res) => {
+          if (res.status == 200) {
+            resolve(await res.json());
+            delete this.servers[server_name];
+          } else {
+            reject(await res.json());
+          }
+        });
+      });
+    },
+    updateGameList: function () {
+      if (this.gameList.length > 0) return; // don't load twice
+      let endpoint = this.baseURL + `game/`;
+      fetch(endpoint, {
+        method: "GET",
+      }).then(async (res) => {
+        if (res.status == 200) {
+          try {
+            this.gameList = await res.json();
+          } catch (e) {
+            console.log("Error while loading game list");
+          }
+        }
+      });
+    },
+    getGameIdentifier: function (game_full_name) {
+      let game = this.gameList.find(
+        (item) => item.game_full_name == game_full_name
+      );
+      return game ? game.game_name : undefined;
+    },
   },
 });
 
