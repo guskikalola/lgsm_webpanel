@@ -1,5 +1,5 @@
 <template>
-    <v-img :src="`/gameIcons/${ game_name }.png`" cover height="200px">
+    <v-img :src="`/gameBanners/${ game_name }.png`" cover height="200px">
 
     </v-img>
 </template>
