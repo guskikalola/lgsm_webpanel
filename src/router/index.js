@@ -21,7 +21,7 @@ const routes = [
     component: () => import('@/layouts/default/Default.vue'),
     children: [
       {
-        path: '',
+        path: 'list',
         name: 'ServerList',
         // route level code-splitting
         // this generates a separate chunk (about.[hash].js) for this route
@@ -35,6 +35,24 @@ const routes = [
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
         component: () => import('@/views/CreateServerView.vue'),
+      },
+      {
+        path: ':servername/panel',
+        name: 'ViewServer',
+        props: true,
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import('@/views/ServerView.vue'),
+      },
+      {
+        path: ':servername/console',
+        name: 'ServerConsole',
+        props: true,
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import('@/views/ServerConsoleView.vue'),
       },
     ],
   },

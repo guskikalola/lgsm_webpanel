@@ -1,43 +1,60 @@
 <template>
   <v-card variant="tonal" :loading="loading" :width="388">
-    <v-toolbar
-      :title="server.server_pretty_name"
-      :elevation="8"
-      density="compact"
-    >
-    <v-dialog
-      v-model="dialog"
-      persistent
-    >
-    <template v-slot:activator="{ props }">
-        <v-btn icon="mdi-trash-can" color="red" v-bind="props"></v-btn>
-    </template>
-    <v-card>
-        <v-card-title class="text-h5">
-          Delete this server?
-        </v-card-title>
-        <v-card-text>You are about to delete <span style="font-weight: -1; color:goldenrod">"{{ server.server_pretty_name }}"</span></v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="green-darken-1"
-            variant="text"
-            @click="dialog = false"
+    <v-toolbar :elevation="8" density="compact">
+      <v-toolbar-title>
+        <router-link
+          :to="{
+            name: 'ViewServer',
+            params: { servername: server.server_name },
+          }"
+          class="text-decoration-none"
+          style="color: var(--v-theme-primary) !important;"
+        >
+          {{ server.server_pretty_name }}
+        </router-link>
+      </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-dialog v-model="dialog" persistent max-width="500">
+        <template v-slot:activator="{ props }">
+          <v-btn icon="mdi-trash-can" color="red" v-bind="props"></v-btn>
+        </template>
+        <v-card>
+          <v-card-title class="text-h5"> Delete this server? </v-card-title>
+          <v-card-text
+            >You are about to delete
+            <span style="font-weight: -1; color: goldenrod"
+              >"{{ server.server_pretty_name }}"</span
+            ></v-card-text
           >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="red"
-            variant="text"
-            @click="deleteServer"
-          >
-            Agree
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="red"
+              variant="text"
+              @click="dialog = false"
+              append-icon="mdi-cancel"
+            >
+              Cancel
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="green"
+              variant="text"
+              @click="deleteServer"
+              append-icon="mdi-check"
+            >
+              Agree
+            </v-btn>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-toolbar>
-    <GameIcon :game_name="server.game_name" />
+    <router-link
+      :to="{ name: 'ViewServer', params: { servername: server.server_name } }"
+    >
+      <GameIcon :game_name="server.game_name" />
+    </router-link>
     <v-card-text class="text-center">
       <v-row align="center">
         <v-col class="text-h6" cols="12">
@@ -57,7 +74,12 @@
           API.servers[server.server_name].server_status ==
             ServerStatusEnum.STARTED
         "
-        >{{ API.servers[server.server_name].server_status == ServerStatusEnum.NOT_INSTALLED ? "INSTALL" : "START" }}</v-btn
+        >{{
+          API.servers[server.server_name].server_status ==
+          ServerStatusEnum.NOT_INSTALLED
+            ? "INSTALL"
+            : "START"
+        }}</v-btn
       >
       <v-btn
         color="red"
@@ -114,8 +136,10 @@ export default {
       ServerStatusEnum: ServerStatusEnum,
       executeMethod: (method) => {
         this.loading = true;
-        if(this.server.server_status == ServerStatusEnum.NOT_INSTALLED) {
-          alert("First run takes some time, it might appear as STOPPED but the server is installing in the background.")
+        if (this.server.server_status == ServerStatusEnum.NOT_INSTALLED) {
+          alert(
+            "First run takes some time, it might appear as STOPPED but the server is installing in the background."
+          );
         }
         apiStore
           .executeMethod(this.server.server_name, method)
@@ -149,13 +173,11 @@ export default {
       },
       deleteServer: () => {
         this.loading = true;
-        apiStore
-        .deleteServer(this.server.server_name)
-        .then(() => {
+        apiStore.deleteServer(this.server.server_name).then(() => {
           this.loading = false;
-        })
+        });
         this.dialog = false;
-      }
+      },
     };
   },
   mounted() {

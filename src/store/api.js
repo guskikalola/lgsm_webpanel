@@ -1,13 +1,29 @@
 // Utilities
 import { defineStore } from "pinia";
+import { useRoute } from "vue-router";
 
 const useAppStore = defineStore("api", {
   state: () => ({
     servers: {},
     baseURL: "/api/v1/",
     gameList: [],
+    currentServer: undefined
   }),
-  getters: {},
+  getters: {
+    currentServer: function (state) {
+      let route = useRoute();
+      let servername = route.params.servername;
+      if (servername == undefined) return undefined;
+
+      let server = this.servers[servername];
+      if (server == undefined) {
+        // Try fetch it
+        this.updateServer(servername);
+      }
+
+      return server;
+    },
+  },
   actions: {
     updateServerList: function (serverPerPage, pageNumber) {
       let endpoint =
@@ -32,11 +48,11 @@ const useAppStore = defineStore("api", {
         fetch(endpoint).then(async (res) => {
           try {
             let server = await res.json();
-            if (this.servers[server_name] != undefined) {
-              let details = this.servers[server_name].details;
-              this.servers[server_name] = server;
-              this.servers[server_name].details = details;
-            }
+            let tmp = this.servers[server_name];
+            this.servers[server_name] = server;
+            if (tmp != undefined)
+              this.servers[server_name].details = tmp.details;
+
             resolve(server);
           } catch (e) {
             reject(e);
@@ -127,7 +143,7 @@ const useAppStore = defineStore("api", {
         (item) => item.game_full_name == game_full_name
       );
       return game ? game.game_name : undefined;
-    },
+    }
   },
 });
 
