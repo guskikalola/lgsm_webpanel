@@ -5,7 +5,7 @@ import { useRoute } from "vue-router";
 const useAppStore = defineStore("api", {
   state: () => ({
     servers: {},
-    baseURL: "http://localhost:8000/api/v1/",
+    baseURL: "/api/v1/",
     gameList: [],
     currentServer: undefined
   }),
