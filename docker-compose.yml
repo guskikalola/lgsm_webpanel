@@ -19,6 +19,7 @@ services:
     volumes:
       - ./servers:/servers
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./logs/backend:/app/logs
     environment:
       MARIADB_USER: lgsm_webpanel
       MARIADB_PASSWORD: password
