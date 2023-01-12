@@ -5,7 +5,7 @@ import { useRoute } from "vue-router";
 const useAppStore = defineStore("api", {
   state: () => ({
     servers: {},
-    baseURL: "/api/v1/",
+    baseURL: "http://localhost:8000/api/v1/",
     gameList: [],
     currentServer: undefined
   }),
@@ -143,6 +143,31 @@ const useAppStore = defineStore("api", {
         (item) => item.game_full_name == game_full_name
       );
       return game ? game.game_name : undefined;
+    },
+    getConsoleStream: function(server_name, limit) {
+      return new EventSource(
+        `${this.baseURL}server/${server_name}/console?limit=${limit}`
+      );
+    },
+    sendCommand: function(server_name, command) {
+      let endpoint = this.baseURL + `server/` + server_name + "/console";
+      return new Promise((resolve, reject) => {
+        fetch(endpoint, {
+          method: "POST",
+          body: JSON.stringify({
+            "command": command
+          }),
+          headers: {
+            "Content-type": "application/json"
+          }
+        }).then(async (res) => {
+          if (res.status == 200) {
+            resolve(true);
+          } else {
+            reject(res.status);
+          }
+        });
+      });
     }
   },
 });
