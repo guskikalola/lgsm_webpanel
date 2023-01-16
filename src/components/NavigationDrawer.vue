@@ -33,7 +33,7 @@
           </v-list-item-content>
         </v-list-item>
         
-        <v-list-item router :to="{ name: 'CreateServer'}">
+        <v-list-item router :to="{ name: 'CreateServerChoose'}">
           <v-list-item-content>
             <v-list-item-title> Create new server </v-list-item-title>
           </v-list-item-content>

@@ -7,7 +7,6 @@ const useAppStore = defineStore("api", {
     servers: {},
     baseURL: "/api/v1/",
     gameList: [],
-    currentServer: undefined
   }),
   getters: {
     currentServer: function (state) {
@@ -138,28 +137,32 @@ const useAppStore = defineStore("api", {
         }
       });
     },
+    getGame: function (game_name) {
+      let game = this.gameList.find((item) => item.game_name == game_name);
+      return game;
+    },
     getGameIdentifier: function (game_full_name) {
       let game = this.gameList.find(
         (item) => item.game_full_name == game_full_name
       );
       return game ? game.game_name : undefined;
     },
-    getConsoleStream: function(server_name, limit) {
+    getConsoleStream: function (server_name, limit) {
       return new EventSource(
         `${this.baseURL}server/${server_name}/console?limit=${limit}`
       );
     },
-    sendCommand: function(server_name, command) {
+    sendCommand: function (server_name, command) {
       let endpoint = this.baseURL + `server/` + server_name + "/console";
       return new Promise((resolve, reject) => {
         fetch(endpoint, {
           method: "POST",
           body: JSON.stringify({
-            "command": command
+            command: command,
           }),
           headers: {
-            "Content-type": "application/json"
-          }
+            "Content-type": "application/json",
+          },
         }).then(async (res) => {
           if (res.status == 200) {
             resolve(true);
@@ -168,7 +171,7 @@ const useAppStore = defineStore("api", {
           }
         });
       });
-    }
+    },
   },
 });
 
