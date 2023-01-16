@@ -1,15 +1,24 @@
 <template>
   <v-container>
     <v-responsive>
+      <ServerOverview v-if="API.currentServer != undefined" :server="API.currentServer" />
     </v-responsive>
   </v-container>
 </template>
 
 <script>
-import ApiStore from '@/store/api'
+import ServerOverview from "@/components/ServerOverview.vue";
+import ApiStore from "@/store/api";
 export default {
-    props: ["servername"],
-    mounted: function() {
-    },
-}
+  setup: function () {
+    let apiStore = ApiStore();
+
+    return {
+      API : apiStore,
+    }
+
+  },
+  mounted: function () {},
+  components: { ServerOverview },
+};
 </script>

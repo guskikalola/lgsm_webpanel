@@ -27,20 +27,23 @@
           ></v-list-item>
         </template>
 
-        <v-list-item router :to="{ name: 'ServerList'}">
+        <v-list-item router :to="{ name: 'ServerList' }">
           <v-list-item-content>
             <v-list-item-title> Servers overview </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        
-        <v-list-item router :to="{ name: 'CreateServerChoose'}">
+
+        <v-list-item router :to="{ name: 'CreateServerChoose' }">
           <v-list-item-content>
             <v-list-item-title> Create new server </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-
       </v-list-group>
-      <v-list-item router :to="{ name: 'Configuration'}" prepend-icon="mdi-tune-vertical">
+      <v-list-item
+        router
+        :to="{ name: 'Configuration' }"
+        prepend-icon="mdi-tune-vertical"
+      >
         <v-list-item-content>
           <v-list-item-title> Configuration </v-list-item-title>
         </v-list-item-content>
@@ -49,9 +52,11 @@
 
     <v-divider></v-divider>
 
-    <v-list v-if="API.currentServer != undefined">
-      <ServerNavigation/>
-    </v-list>
+    <transition name="fade">
+      <v-list v-if="API.currentServer != undefined">
+        <ServerNavigation />
+      </v-list>
+    </transition>
 
     <slot name="server"></slot>
   </v-navigation-drawer>
