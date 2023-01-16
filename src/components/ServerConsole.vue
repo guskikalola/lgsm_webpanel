@@ -1,8 +1,9 @@
 <template>
-  <div style="overflow-y: scroll" class="d-flex flex-column">
+  <div class="d-flex flex-column">
     <v-container>
       <v-col cols="12">
         <v-list
+          id="list"
           lines="one"
           density="compact"
           height="500"
@@ -39,6 +40,11 @@
         </v-col>
       </v-container>
     </v-form>
+    <v-switch
+      v-model="autoscroll"
+      label="Autoscroll"
+      color="info"
+    ></v-switch>
   </div>
 </template>
 
@@ -56,16 +62,35 @@ export default {
   mounted() {
     let route = useRoute();
     let source = this.API.getConsoleStream(route.params.servername, 40);
-
     source.onmessage = (event) => {
       event.data.split("\\n").forEach((item) => this.console.push(item));
     };
+
+
+    let list = document.getElementById("list");
+
+    let observer = new MutationObserver((mutationList, observer) => {
+      for (const mutation of mutationList) {
+        if (mutation.type == "childList") {
+          if (this.autoscroll) {
+            list.scroll({
+              top: list.scrollHeight,
+              left: 0,
+              behavior: "smooth",
+            });
+          }
+        }
+      }
+    });
+
+    observer.observe(list, { childList: true , attributes: false, subtree: true })
   },
   data() {
     return {
       console: [],
       command: "",
       servername: useRoute().params.servername,
+      autoscroll: true,
     };
   },
   methods: {
