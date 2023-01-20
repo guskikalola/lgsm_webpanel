@@ -41,7 +41,6 @@
 <script>
 import ApiStore from "@/store/api.js";
 import { useRoute } from 'vue-router';
-import { computed } from 'vue-demi';
 export default {
   setup() {
     const apiStore = ApiStore();

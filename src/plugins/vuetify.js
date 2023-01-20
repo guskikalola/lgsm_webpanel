@@ -6,7 +6,6 @@
 
 // Blueprints
 import { md3,md2,md1 } from 'vuetify/blueprints'
-import { VVirtualScroll } from 'vuetify/labs/VVirtualScroll'
 
 // Styles
 import '@mdi/font/css/materialdesignicons.css'
@@ -22,6 +21,5 @@ export default createVuetify({
     defaultTheme: 'dark'
   },
   components: {
-    VVirtualScroll,
   },
 })

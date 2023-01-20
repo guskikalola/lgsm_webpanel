@@ -1,13 +1,13 @@
 <template>
   <v-container>
     <v-responsive>
-      <ServerOverview v-if="API.currentServer != undefined" :server="API.currentServer" />
+      <ServerPanel v-if="API.currentServer != undefined" :server="API.currentServer" />
     </v-responsive>
   </v-container>
 </template>
 
 <script>
-import ServerOverview from "@/components/ServerOverview.vue";
+import ServerPanel from "@/components/ServerPanel.vue";
 import ApiStore from "@/store/api";
 export default {
   setup: function () {
@@ -19,6 +19,6 @@ export default {
 
   },
   mounted: function () {},
-  components: { ServerOverview },
+  components: { ServerPanel },
 };
 </script>

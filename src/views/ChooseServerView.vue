@@ -17,7 +17,6 @@
   <script>
 import GameServer from "@/components/GameServer.vue";
 import ApiStore from "@/store/api";
-import { computed } from "vue-demi";
 export default {
   setup() {
     let apiStore = ApiStore();

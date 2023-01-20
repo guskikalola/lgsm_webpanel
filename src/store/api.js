@@ -62,6 +62,10 @@ const useAppStore = defineStore("api", {
     feedServerDetails: function (server_name) {
       let endpoint = this.baseURL + `server/${server_name}?with_details=true`;
       return new Promise((resolve, reject) => {
+        if (this.servers[server_name] != undefined && this.servers[server_name].details != undefined) {
+          resolve(false);
+          return;
+        }
         fetch(endpoint).then(async (res) => {
           try {
             let server = await res.json();
